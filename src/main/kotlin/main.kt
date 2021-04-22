@@ -1,4 +1,3 @@
-
 import java.text.SimpleDateFormat
 
 
@@ -16,12 +15,32 @@ fun main() {
         print("명령어) ")
         val command = readLineTrim()
 
-        when (command) {
-            "system exit" -> {
+        when {
+            command == "system exit" -> {
                 println("프로그램을 종료합니다.")
                 break@loop
             }
-            "article write" -> {
+            command.startsWith("article delete ") -> {
+                val id = command.trim().split(" ")[2].toInt()
+
+                var articleToDelete: Article? = null
+
+                for (article in articles) {
+                    if (article.id == id) {
+                        articleToDelete = article
+                    }
+                }
+
+                if (articleToDelete == null) {
+                    println("${id}번 게시물은 존재하지 않습니다.")
+                    continue
+                }
+
+                articles.remove(articleToDelete)
+
+                println("${id}번 게시물을 삭제하였습니다.")
+            }
+            command == "article write" -> {
                 val id = articlesLastId + 1
                 val regDate = Util.getNowDateStr()
                 val updateDate = Util.getNowDateStr()
@@ -38,10 +57,10 @@ fun main() {
 
                 articlesLastId = id
             }
-            "article list" -> {
+            command == "article list" -> {
                 println("번호 / 작성날짜 / 제목")
 
-                for ( article in articles ) {
+                for (article in articles) {
                     println("${article.id} / ${article.regDate} / ${article.title}")
                 }
             }
