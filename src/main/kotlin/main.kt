@@ -44,6 +44,24 @@ fun main() {
 
                 println("${id}번 게시물을 삭제하였습니다.")
             }
+            command.startsWith("article modify ") -> {
+                val id = command.trim().split(" ")[2].toInt()
+
+                var articleToModify = getArticleById(id)
+
+                if (articleToModify == null) {
+                    println("${id}번 게시물은 존재하지 않습니다.")
+                    continue
+                }
+
+                print("${id}번 게시물 새 제목 : ")
+                articleToModify.title = readLineTrim()
+                print("${id}번 게시물 새 내용 : ")
+                articleToModify.body = readLineTrim()
+                articleToModify.updateDate = Util.getNowDateStr()
+
+                println("${id}번 게시물을 수정하였습니다.")
+            }
             command == "article write" -> {
                 val id = articlesLastId + 1
                 val regDate = Util.getNowDateStr()
@@ -80,9 +98,9 @@ fun main() {
 data class Article(
     val id: Int,
     val regDate: String,
-    val updateDate: String,
-    val title: String,
-    val body: String
+    var updateDate: String,
+    var title: String,
+    var body: String
 )
 
 object Util {
