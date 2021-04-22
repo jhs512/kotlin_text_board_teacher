@@ -72,10 +72,17 @@ fun main() {
 
                 println("${id}번 게시물이 작성되었습니다.")
             }
-            command == "article list" -> {
+            command.startsWith("article list ") -> {
+                val page = command.trim().split(" ")[2].toInt()
+
+                val itemsCountInAPage = 10
+                val fromIndex = (page - 1) * itemsCountInAPage
+
+                val articles = getArticles(fromIndex, itemsCountInAPage)
+
                 println("번호 / 작성날짜 / 제목")
 
-                for (article in articles.reversed()) {
+                for (article in articles) {
                     println("${article.id} / ${article.regDate} / ${article.title}")
                 }
             }
@@ -93,6 +100,23 @@ fun main() {
 var articlesLastId = 0
 
 val articles = mutableListOf<Article>()
+
+fun getArticles(fromIndex:Int, takeCount:Int): List<Article> {
+    val startIndex = articles.size - 1 - fromIndex
+    var endIndex = startIndex - takeCount + 1
+
+    if ( endIndex < 0 ) {
+        endIndex = 0
+    }
+
+    val filteredArticles = mutableListOf<Article>()
+
+    for ( i in startIndex downTo endIndex ) {
+        filteredArticles.add(articles[i])
+    }
+
+    return filteredArticles
+}
 
 fun getArticleById(id: Int): Article? {
     for (article in articles) {
@@ -118,7 +142,7 @@ fun addArticle(title: String, body: String): Int {
 }
 
 fun makeTestArticles() {
-    for (id in 1..100) {
+    for (id in 1..25) {
         val title = "제목_$id"
         val body = "내용_$id"
 
