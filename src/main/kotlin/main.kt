@@ -1,38 +1,9 @@
 import java.text.SimpleDateFormat
 
-
-fun readLineTrim() = readLine()!!.trim()
-
-// 가장 마지막에 입력된 게시물 번호
-var articlesLastId = 0
-
-val articles = mutableListOf<Article>()
-
-fun getArticleById(id: Int): Article? {
-    for (article in articles) {
-        if (article.id == id) {
-            return article
-        }
-    }
-
-    return null
-}
-
-fun addArticle(title: String, body: String): Int {
-    val id = articlesLastId + 1
-    val regDate = Util.getNowDateStr()
-    val updateDate = Util.getNowDateStr()
-
-    val article = Article(id, regDate, updateDate, title, body)
-    articles.add(article)
-
-    articlesLastId = id
-
-    return id
-}
-
 fun main() {
     println("== 게시판 관리 프로그램 시작 ==")
+
+    makeTestArticles();
 
     loop@ while (true) {
         print("명령어) ")
@@ -117,6 +88,44 @@ fun main() {
     println("== 게시판 관리 프로그램 끝 ==")
 }
 
+/* 게시물 관련 시작 */
+// 가장 마지막에 입력된 게시물 번호
+var articlesLastId = 0
+
+val articles = mutableListOf<Article>()
+
+fun getArticleById(id: Int): Article? {
+    for (article in articles) {
+        if (article.id == id) {
+            return article
+        }
+    }
+
+    return null
+}
+
+fun addArticle(title: String, body: String): Int {
+    val id = articlesLastId + 1
+    val regDate = Util.getNowDateStr()
+    val updateDate = Util.getNowDateStr()
+
+    val article = Article(id, regDate, updateDate, title, body)
+    articles.add(article)
+
+    articlesLastId = id
+
+    return id
+}
+
+fun makeTestArticles() {
+    for ( id in 1 .. 100 ) {
+        val title = "제목_$id"
+        val body = "내용_$id"
+
+        addArticle(title, body)
+    }
+}
+
 data class Article(
     val id: Int,
     val regDate: String,
@@ -124,6 +133,10 @@ data class Article(
     var title: String,
     var body: String
 )
+/* 게시물 관련 끝 */
+
+/* 유틸관련 시작 */
+fun readLineTrim() = readLine()!!.trim()
 
 object Util {
     fun getNowDateStr(): String {
@@ -132,3 +145,4 @@ object Util {
         return dateFormat.format(System.currentTimeMillis())
     }
 }
+/* 유틸관련 끝 */
