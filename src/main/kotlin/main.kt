@@ -3,6 +3,9 @@ import java.text.SimpleDateFormat
 
 fun readLineTrim() = readLine()!!.trim()
 
+// 가장 마지막에 입력된 게시물 번호
+var articlesLastId = 0
+
 val articles = mutableListOf<Article>()
 
 fun getArticleById(id: Int): Article? {
@@ -15,11 +18,21 @@ fun getArticleById(id: Int): Article? {
     return null
 }
 
+fun addArticle(title: String, body: String): Int {
+    val id = articlesLastId + 1
+    val regDate = Util.getNowDateStr()
+    val updateDate = Util.getNowDateStr()
+
+    val article = Article(id, regDate, updateDate, title, body)
+    articles.add(article)
+
+    articlesLastId = id
+
+    return id
+}
+
 fun main() {
     println("== 게시판 관리 프로그램 시작 ==")
-
-    // 가장 마지막에 입력된 게시물 번호
-    var articlesLastId = 0
 
     loop@ while (true) {
         print("명령어) ")
@@ -79,21 +92,14 @@ fun main() {
                 println("내용 : ${article.body}")
             }
             command == "article write" -> {
-                val id = articlesLastId + 1
-                val regDate = Util.getNowDateStr()
-                val updateDate = Util.getNowDateStr()
-
                 print("제목 : ")
                 val title = readLineTrim()
                 print("내용 : ")
                 val body = readLineTrim()
-                val article = Article(id, regDate, updateDate, title, body)
+
+                val id = addArticle(title, body)
 
                 println("${id}번 게시물이 작성되었습니다.")
-
-                articles.add(article)
-
-                articlesLastId = id
             }
             command == "article list" -> {
                 println("번호 / 작성날짜 / 제목")
