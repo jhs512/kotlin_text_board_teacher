@@ -62,6 +62,22 @@ fun main() {
 
                 println("${id}번 게시물을 수정하였습니다.")
             }
+            command.startsWith("article detail ") -> {
+                val id = command.trim().split(" ")[2].toInt()
+
+                var article = getArticleById(id)
+
+                if (article == null) {
+                    println("${id}번 게시물은 존재하지 않습니다.")
+                    continue
+                }
+
+                println("번호 : ${article.id}")
+                println("작성날짜 : ${article.regDate}")
+                println("갱신날짜 : ${article.updateDate}")
+                println("제목 : ${article.title}")
+                println("내용 : ${article.body}")
+            }
             command == "article write" -> {
                 val id = articlesLastId + 1
                 val regDate = Util.getNowDateStr()
