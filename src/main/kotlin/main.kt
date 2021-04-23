@@ -27,8 +27,15 @@ fun main() {
             command.startsWith("article list ") -> {
                 val commandBits = command.trim().split(" ")
 
+                // article list =>
+                // article list 제목 5
+                // article list 4
+
                 var page = 1
                 var searchKeyword = ""
+
+                // article list 제목_1 1
+                // article list 4
 
                 if (commandBits.size == 4) {
                     searchKeyword = commandBits[2]
@@ -132,7 +139,7 @@ fun getFilteredArticles(searchKeyword: String, offsetCount: Int, takeCount: Int)
     var filtered1Articles = articles
 
     if (searchKeyword.isNotEmpty()) {
-        filtered1Articles = mutableListOf<Article>()
+        filtered1Articles = mutableListOf()
 
         for (article in articles) {
             if (article.title.contains(searchKeyword)) {
@@ -141,14 +148,14 @@ fun getFilteredArticles(searchKeyword: String, offsetCount: Int, takeCount: Int)
         }
     }
 
-    val filtered2Articles = mutableListOf<Article>()
-
     val startIndex = filtered1Articles.lastIndex - offsetCount
     var endIndex = startIndex - takeCount + 1
 
     if (endIndex < 0) {
         endIndex = 0
     }
+
+    val filtered2Articles = mutableListOf<Article>()
 
     for (i in startIndex downTo endIndex) {
         filtered2Articles.add(filtered1Articles[i])
