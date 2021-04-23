@@ -5,14 +5,38 @@ fun main() {
 
     makeTestArticles();
 
-    loop@ while (true) {
+    while (true) {
         print("명령어) ")
         val command = readLineTrim()
 
         when {
             command == "system exit" -> {
                 println("프로그램을 종료합니다.")
-                break@loop
+                break
+            }
+            command == "article write" -> {
+                print("제목 : ")
+                val title = readLineTrim()
+                print("내용 : ")
+                val body = readLineTrim()
+
+                val id = addArticle(title, body)
+
+                println("${id}번 게시물이 작성되었습니다.")
+            }
+            command.startsWith("article list ") -> {
+                val page = command.trim().split(" ")[2].toInt()
+
+                val itemsCountInAPage = 5
+                val offsetCount = (page - 1) * itemsCountInAPage
+
+                val filteredArticles = getFilteredArticles(offsetCount, itemsCountInAPage)
+
+                println("번호 / 작성날짜 / 제목")
+
+                for (article in filteredArticles) {
+                    println("${article.id} / ${article.regDate} / ${article.title}")
+                }
             }
             command.startsWith("article delete ") -> {
                 val id = command.trim().split(" ")[2].toInt()
@@ -62,30 +86,6 @@ fun main() {
                 println("제목 : ${article.title}")
                 println("내용 : ${article.body}")
             }
-            command == "article write" -> {
-                print("제목 : ")
-                val title = readLineTrim()
-                print("내용 : ")
-                val body = readLineTrim()
-
-                val id = addArticle(title, body)
-
-                println("${id}번 게시물이 작성되었습니다.")
-            }
-            command.startsWith("article list ") -> {
-                val page = command.trim().split(" ")[2].toInt()
-
-                val itemsCountInAPage = 10
-                val fromIndex = (page - 1) * itemsCountInAPage
-
-                val articles = getArticles(fromIndex, itemsCountInAPage)
-
-                println("번호 / 작성날짜 / 제목")
-
-                for (article in articles) {
-                    println("${article.id} / ${article.regDate} / ${article.title}")
-                }
-            }
             else -> {
                 println("`$command` 은(는) 존재하지 않는 명령어 입니다.")
             }
@@ -96,27 +96,17 @@ fun main() {
 }
 
 /* 게시물 관련 시작 */
-// 가장 마지막에 입력된 게시물 번호
+data class Article(
+    val id: Int,
+    val regDate: String,
+    var updateDate: String,
+    var title: String,
+    var body: String
+)
+
 var articlesLastId = 0
 
 val articles = mutableListOf<Article>()
-
-fun getArticles(fromIndex:Int, takeCount:Int): List<Article> {
-    val startIndex = articles.size - 1 - fromIndex
-    var endIndex = startIndex - takeCount + 1
-
-    if ( endIndex < 0 ) {
-        endIndex = 0
-    }
-
-    val filteredArticles = mutableListOf<Article>()
-
-    for ( i in startIndex downTo endIndex ) {
-        filteredArticles.add(articles[i])
-    }
-
-    return filteredArticles
-}
 
 fun getArticleById(id: Int): Article? {
     for (article in articles) {
@@ -126,6 +116,32 @@ fun getArticleById(id: Int): Article? {
     }
 
     return null
+}
+
+fun getFilteredArticles(offsetCount: Int, takeCount: Int): List<Article> {
+    val startIndex = articles.lastIndex - offsetCount
+    var endIndex = startIndex - takeCount + 1
+
+    if (endIndex < 0) {
+        endIndex = 0
+    }
+
+    val filteredArticles = mutableListOf<Article>()
+
+    for (i in startIndex downTo endIndex) {
+        filteredArticles.add(articles[i])
+    }
+
+    return filteredArticles
+}
+
+fun makeTestArticles() {
+    for (id in 1..100) {
+        val title = "제목_$id"
+        val body = "내용_$id"
+
+        addArticle(title, body)
+    }
 }
 
 fun addArticle(title: String, body: String): Int {
@@ -140,23 +156,6 @@ fun addArticle(title: String, body: String): Int {
 
     return id
 }
-
-fun makeTestArticles() {
-    for (id in 1..25) {
-        val title = "제목_$id"
-        val body = "내용_$id"
-
-        addArticle(title, body)
-    }
-}
-
-data class Article(
-    val id: Int,
-    val regDate: String,
-    var updateDate: String,
-    var title: String,
-    var body: String
-)
 /* 게시물 관련 끝 */
 
 /* 유틸관련 시작 */
