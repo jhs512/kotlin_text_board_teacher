@@ -3,7 +3,7 @@ import java.text.SimpleDateFormat
 fun main() {
     println("== 게시판 관리 프로그램 시작 ==")
 
-    makeTestArticles();
+    makeTestArticles()
 
     while (true) {
         print("명령어) ")
@@ -25,12 +25,22 @@ fun main() {
                 println("${id}번 게시물이 작성되었습니다.")
             }
             command.startsWith("article list ") -> {
-                val page = command.trim().split(" ")[2].toInt()
+                val commandBits = command.trim().split(" ")
+
+                var page = 1
+                var searchKeyword = ""
+
+                if (commandBits.size == 4) {
+                    searchKeyword = commandBits[2]
+                    page = commandBits[3].toInt()
+                } else if (commandBits.size == 3) {
+                    page = commandBits[2].toInt()
+                }
 
                 val itemsCountInAPage = 5
                 val offsetCount = (page - 1) * itemsCountInAPage
 
-                val filteredArticles = getFilteredArticles(offsetCount, itemsCountInAPage)
+                val filteredArticles = getFilteredArticles(searchKeyword, offsetCount, itemsCountInAPage)
 
                 println("번호 / 작성날짜 / 제목")
 
@@ -41,7 +51,7 @@ fun main() {
             command.startsWith("article delete ") -> {
                 val id = command.trim().split(" ")[2].toInt()
 
-                var articleToDelete = getArticleById(id)
+                val articleToDelete = getArticleById(id)
 
                 if (articleToDelete == null) {
                     println("${id}번 게시물은 존재하지 않습니다.")
@@ -55,7 +65,7 @@ fun main() {
             command.startsWith("article modify ") -> {
                 val id = command.trim().split(" ")[2].toInt()
 
-                var articleToModify = getArticleById(id)
+                val articleToModify = getArticleById(id)
 
                 if (articleToModify == null) {
                     println("${id}번 게시물은 존재하지 않습니다.")
@@ -73,7 +83,7 @@ fun main() {
             command.startsWith("article detail ") -> {
                 val id = command.trim().split(" ")[2].toInt()
 
-                var article = getArticleById(id)
+                val article = getArticleById(id)
 
                 if (article == null) {
                     println("${id}번 게시물은 존재하지 않습니다.")
@@ -118,25 +128,37 @@ fun getArticleById(id: Int): Article? {
     return null
 }
 
-fun getFilteredArticles(offsetCount: Int, takeCount: Int): List<Article> {
-    val startIndex = articles.lastIndex - offsetCount
+fun getFilteredArticles(searchKeyword: String, offsetCount: Int, takeCount: Int): List<Article> {
+    var filtered1Articles = articles
+
+    if (searchKeyword.isNotEmpty()) {
+        filtered1Articles = mutableListOf<Article>()
+
+        for (article in articles) {
+            if (article.title.contains(searchKeyword)) {
+                filtered1Articles.add(article)
+            }
+        }
+    }
+
+    val filtered2Articles = mutableListOf<Article>()
+
+    val startIndex = filtered1Articles.lastIndex - offsetCount
     var endIndex = startIndex - takeCount + 1
 
     if (endIndex < 0) {
         endIndex = 0
     }
 
-    val filteredArticles = mutableListOf<Article>()
-
     for (i in startIndex downTo endIndex) {
-        filteredArticles.add(articles[i])
+        filtered2Articles.add(filtered1Articles[i])
     }
 
-    return filteredArticles
+    return filtered2Articles
 }
 
 fun makeTestArticles() {
-    for (id in 1..100) {
+    for (id in 1..1000) {
         val title = "제목_$id"
         val body = "내용_$id"
 
